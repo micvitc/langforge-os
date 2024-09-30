@@ -10,6 +10,8 @@ readme = "README.md"
 python = "^3.12"
 langchain-ollama = "^0.2.0"
 langgraph = "^0.2.22"
+numpy = "^2.1.1"
+tqdm = "^4.66.5"
 
 
 [tool.poetry.group.dev.dependencies]
