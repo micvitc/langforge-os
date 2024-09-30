@@ -1,6 +1,6 @@
 # langforge-os
 
-![Logo](static/logo.jpg)
+<img src="static/logo.jpg" alt="Logo" width="200"/>
 
 ## A Natural Language Interface to your OS
 
