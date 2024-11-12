@@ -40,8 +40,14 @@ def check_sys_tool():
 def run_process(command: str):
     """Run a command in the shell."""
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
-
+    print(result.stdout)
     return result.stdout if result.returncode == 0 else result.stderr
 
 
-tools = [check_sys_tool, run_process]
+@tool
+def chat(message: str):
+    """Chat with the user. Use this if you are not sure what to do."""
+    return message
+
+
+tools = [chat, check_sys_tool, run_process]
