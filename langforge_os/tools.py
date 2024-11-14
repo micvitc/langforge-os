@@ -4,7 +4,7 @@ from langchain_core.tools import tool
 
 
 @tool
-def check_sys_tool():
+def check_sys_tool(check: str):
     """Get the system information."""
 
     cpu_info = {
@@ -50,7 +50,6 @@ def run_python(script: str):
     result = subprocess.run(
         f"python -c '{script}'", shell=True, capture_output=True, text=True
     )
-    print(result.stdout)
     return result.stdout if result.returncode == 0 else result.stderr
 
 
