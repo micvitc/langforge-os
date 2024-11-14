@@ -38,8 +38,18 @@ def check_sys_tool():
 
 @tool
 def run_process(command: str):
-    """Run a command in the shell."""
+    """Run a command in the shell. Use this to run any bash command."""
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    print(result.stdout)
+    return result.stdout if result.returncode == 0 else result.stderr
+
+
+@tool
+def run_python(script: str):
+    """Run a python script. Use this to run any python script."""
+    result = subprocess.run(
+        f"python -c '{script}'", shell=True, capture_output=True, text=True
+    )
     print(result.stdout)
     return result.stdout if result.returncode == 0 else result.stderr
 
@@ -50,4 +60,4 @@ def chat(message: str):
     return message
 
 
-tools = [chat, check_sys_tool, run_process]
+tools = [check_sys_tool, run_process, run_python]

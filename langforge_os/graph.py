@@ -1,14 +1,37 @@
-from typing import Literal
+from typing import Literal, Annotated
+from typing_extensions import TypedDict
 
-from langgraph.graph import StateGraph, MessagesState
+from langgraph.graph import StateGraph
 from langchain_ollama import ChatOllama
 from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.memory import MemorySaver
-
+from langgraph.graph.message import AnyMessage, add_messages
 from langforge_os.tools import tools
+from langchain_core.prompts import ChatPromptTemplate
+from langgraph.graph import START, END
+from pydantic import BaseModel
+from langchain_core.messages import ToolMessage, HumanMessage
+
+assistant_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a helpful support assistant. "
+            " Use the provided tools to assist the user's queries. "
+            " When searching, be persistent. Expand your query bounds if the first search returns no results. "
+            " If a search comes up empty, expand your search before giving up.",
+        ),
+        ("placeholder", "{messages}"),
+    ]
+)
+
 
 memory = MemorySaver()
 tool_node = ToolNode(tools)
+
+
+class State(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
 
 
 model_with_tools = ChatOllama(
@@ -21,30 +44,50 @@ def filter_messages(messages: list):
     return messages[-5:]
 
 
-def should_continue(state: MessagesState) -> Literal["tools", "__end__"]:
+def ask_human(state: State):
+    response = input("What do you think?: ")
+    return {"messages": [("human", response)]}
+
+
+def should_continue(state: State) -> Literal["tools", "__end__"]:
     messages = state["messages"]
     last_message = messages[-1]
-    if last_message.tool_calls:
-        return "tools"
-    return "__end__"
+    if not last_message.tool_calls:
+        return "end"
+    else:
+        messages[-1].pretty_print()
+        user_input = input("Approve the tool call? (y/n): ")
+        if user_input.lower() == "y":
+            return "continue"
+        else:
+            return "ask_human"
 
 
-def call_model(state: MessagesState):
+runnable = assistant_prompt | model_with_tools.bind_tools(tools)
+
+
+def call_model(state: State):
     messages = filter_messages(state["messages"])
-    response = model_with_tools.invoke(messages)
+    response = runnable.invoke({"messages": messages})
     return {"messages": [response]}
 
 
-workflow = StateGraph(MessagesState)
+workflow = StateGraph(State)
 
-workflow.add_node("agent", call_model)
+workflow.add_node("assistant", call_model)
 workflow.add_node("tools", tool_node)
-
-workflow.add_edge("__start__", "agent")
+workflow.add_node("ask_human", ask_human)
+workflow.add_edge(START, "assistant")
 workflow.add_conditional_edges(
-    "agent",
+    "assistant",
     should_continue,
+    {
+        "ask_human": "ask_human",
+        "continue": "tools",
+        "end": END,
+    },
 )
-workflow.add_edge("tools", "agent")
+workflow.add_edge("ask_human", "assistant")
+workflow.add_edge("tools", "assistant")
 
 app = workflow.compile(checkpointer=memory)
