@@ -10,6 +10,8 @@ from langforge_os.tools import tools
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import START, END
 
+from main import model_name
+
 assistant_prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -32,10 +34,14 @@ class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 
-model_with_tools = ChatOllama(
-    model="llama3.1:8b-instruct-q4_0",
-    temperature=0,
-).bind_tools(tools)
+try:
+    model_with_tools = ChatOllama(
+        model=model_name,
+        temperature=0,
+    ).bind_tools(tools)
+except Exception as e:
+    print("Error loading model:", e)
+    print("Please check the model name in the config file.")
 
 
 def filter_messages(messages: list):

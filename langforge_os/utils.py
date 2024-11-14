@@ -1,5 +1,6 @@
 from IPython.display import Image, display
-from ..graph import app
+import os
+import yaml
 
 
 def display_graph(graph):
@@ -13,5 +14,17 @@ def display_graph(graph):
         pass
 
 
+def read_config(CONFIG_PATH):
+    if os.path.exists(CONFIG_PATH):
+        with open(CONFIG_PATH, "r") as file:
+            return yaml.safe_load(file)
+    return {}
+
+
+def write_config(config, CONFIG_PATH):
+    with open(CONFIG_PATH, "w") as file:
+        yaml.dump(config, file)
+
+
 if __name__ == "__main__":
-    display_graph(app)
+    pass
