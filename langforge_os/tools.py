@@ -21,7 +21,7 @@ def check_sys_tool(check: str):
         "Memory Usage (%)": memory_info.percent,
     }
 
-    disk_info = psutil.disk_usage("/mnt/c")
+    disk_info = psutil.disk_usage("/")
     disk_details = {
         "Total Disk Space (GB)": round(disk_info.total / (1024**3), 2),
         "Used Disk Space (GB)": round(disk_info.used / (1024**3), 2),
