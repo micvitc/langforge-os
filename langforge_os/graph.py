@@ -9,8 +9,6 @@ from langgraph.graph.message import AnyMessage, add_messages
 from langforge_os.tools import tools
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import START, END
-from pydantic import BaseModel
-from langchain_core.messages import ToolMessage, HumanMessage
 
 assistant_prompt = ChatPromptTemplate.from_messages(
     [
