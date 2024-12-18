@@ -2,13 +2,14 @@ from typing import Literal, Annotated
 from typing_extensions import TypedDict
 
 from langgraph.graph import StateGraph
-from langchain_ollama import ChatOllama
 from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph.message import AnyMessage, add_messages
 from langforge_os.tools import tools
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import START, END
+from langchain_openai import ChatOpenAI
+
 
 from main import model_name
 
@@ -35,9 +36,8 @@ class State(TypedDict):
 
 
 try:
-    model_with_tools = ChatOllama(
-        model=model_name,
-        temperature=0,
+    model_with_tools = ChatOpenAI(
+        model=model_name, base_url="http://localhost:11434/v1", api_key="ollama"
     ).bind_tools(tools)
 except Exception as e:
     print("Error loading model:", e)
