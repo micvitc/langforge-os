@@ -29,7 +29,7 @@ Currently, only Linux is supported.
 
 2. Install dependencies:
 
-    This project requires Ollama as a model server for now, but this may change in the near future.
+    This project can use any OpenAI-compatible endpoint. We recommend using Ollama.
 
     - Install [Ollama](https://ollama.com/download) and download a model with tool-calling functionality.
     - Install at least [Python 3.12](https://www.python.org/downloads/release/python-3120/).
@@ -49,13 +49,21 @@ Currently, only Linux is supported.
     python main.py
     ```
 
-    It will ask you for a model name initially. You can check the available models using:
+    It will ask you for a model name, base URL, and API key initially. In case you are using Ollama, this should be the config:
+    
+    ```yaml
+    model_name: <model_name>
+    base_url: http://localhost:11434/v1
+    api_key: ollama
+    ```
+
+    You can check the available models using:
+
     ```bash
     ollama serve
     ```
 
-    The model name can be changed later in `config.yaml`.
-
+    The model name and other details can be changed later in `config.yaml`.
 
 ## License
 

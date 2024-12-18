@@ -11,7 +11,7 @@ from langgraph.graph import START, END
 from langchain_openai import ChatOpenAI
 
 
-from main import model_name
+from main import model_name, base_url, api_key
 
 assistant_prompt = ChatPromptTemplate.from_messages(
     [
@@ -37,7 +37,7 @@ class State(TypedDict):
 
 try:
     model_with_tools = ChatOpenAI(
-        model=model_name, base_url="http://localhost:11434/v1", api_key="ollama"
+        model=model_name, base_url=base_url, api_key=api_key
     ).bind_tools(tools)
 except Exception as e:
     print("Error loading model:", e)
